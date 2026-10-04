@@ -17,7 +17,24 @@ def matrix_operations(A=None, B=None):
     real matrices of matching size. Return a tuple in the specified order.
     """
     # YOUR CODE HERE
-    raise NotImplementedError()
+    """
+    AB = [[(3 * 1) + (4 * 0), (3 * 2) + (4 * -1)], [(2 * 1) + (1 * 0), (2 * 2) + (1 * -1)]]
+       = [[3, 2], [2, 3]]
+    BA = [[(1 * 3) + (2 * 2), (1 * 4) + (2 * 1)], [(0 * 3) + *(-1 * 2), (0 * 4) + (-1 * 1)]]
+       = [[7, 6], [1, 3]]
+    
+    (A + B)^T = ([[4, 6], [2, 0]])^T
+              = [[4, 2], [6, 0]]
+    
+    AB^T = [[3, 2], [2, 3]]
+
+    trace(A) = 3 + 1
+             = 4
+
+    trace(AB) = 3 + 3
+              = 6
+    
+    """
 
 
 # P1 Q2: Derive the given M eigenpairs and verify Mv=lambda*v.
@@ -28,8 +45,44 @@ def eigensystem(M=None):
     Vectors are columns paired with values; order, sign, and nonzero scale
     are free. Vectors must span each eigenspace, including repeated roots.
     """
-    # YOUR CODE HERE
-    raise NotImplementedError()
+
+    """
+        Using determinant to find eigenvalues: det(M - λI) = 0
+        
+            det([[2, -1], [-1, 2]] - λ[[1, 0], [0, 1]]) = 0
+            det([[2 - λ , -1], [-1, 2 - λ]]) = 0
+            (2 - λ)(2 - λ) - (-1)(-1) = 0
+            4 + λ^2 + λ - 1 = 0
+            λ^2 + λ + 3 = 0
+            λ1 = 3, λ2 = 1
+
+            To find the eigenvectors to prove that Mv = λv:
+                let λ1 = 3
+                ([[2 - λ , -1], [-1, 2 - λ]])
+                ([[2 - 3 , -1], [-1, 2 - 3]])
+                = ([[-1, -1], [-1, -1])[[x], [y]] = [[0], [0]]
+
+                let v1 = [[1], [-1]]
+                To verify Mv1 = λ1v1:
+                Mv1 = [[2, -1], [-1, 2]] * [[1], [-1]] = [[3], [-3]] 
+                    = 3[[1], [-1]] = λ1v1
+                
+                let λ2 = 1
+                ([[2 - λ , -1], [-1, 2 - λ]])
+                ([[2 - 1 , -1], [-1, 2 - 1]])
+                = [[1, -1], [-1, 1]] [[x], [y]] = [[0], [0]]
+
+                let v2 = [[1], [1]]
+                To verify Mv2 = λ2v2:
+                Mv1 = [[2, -1], [-1, 2]] * [[1], [1]] = [[3], [1]] 
+                                    = 1[[1], [1]] = λ2v2
+
+            
+            Therefore, Mv = λv
+
+
+    """
+    
 
 
 # P1 Q3: Prove trace(AB)=trace(BA) for compatible matrices.
