@@ -20,8 +20,8 @@ def matrix_operations(A=None, B=None):
     """
     AB = [[(3 * 1) + (4 * 0), (3 * 2) + (4 * -1)], [(2 * 1) + (1 * 0), (2 * 2) + (1 * -1)]]
        = [[3, 2], [2, 3]]
-    BA = [[(1 * 3) + (2 * 2), (1 * 4) + (2 * 1)], [(0 * 3) + *(-1 * 2), (0 * 4) + (-1 * 1)]]
-       = [[7, 6], [1, 3]]
+    BA = [[(1 * 3) + (2 * 2), (1 * 4) + (2 * 1)], [(0 * 3) + (-1 * 2), (0 * 4) + (-1 * 1)]]
+       = [[7, 6], [-2, -1]]
     
     (A + B)^T = ([[4, 6], [2, 0]])^T
               = [[4, 2], [6, 0]]
@@ -88,12 +88,46 @@ def eigensystem(M=None):
 # P1 Q3: Prove trace(AB)=trace(BA) for compatible matrices.
 # YOUR ANSWER HERE
 
+"""
+    trace(AB) = 6
+    (Obtained from Q1)
+    trace(BA) = 
+    [[7, 6], [-2, -1]]
+     = 6
+
+    Therefore, trace(AB) = trace(BA)    
+    
+
+"""
+
 # P1 Q4: Show the given C is invertible, and compute its inverse step by step.
 # YOUR ANSWER HERE
 def matrix_inverse(C=None):
     """Return inverse of nonsingular square C; default C=[[4,7],[2,6]]."""
     # YOUR CODE HERE
-    raise NotImplementedError()
+    """
+    To compute the inverse of a 2x2 matrix, A^(-1):
+        1 / ad - bc * [[d, -b], [-c, a]]
+         = 1 / (4)(6) - (7)(2) * [[6, -7], [-2, 4]]
+         = 1 / 10 * [[6, -7], [-2, 4]]
+         = [[0.6, -0.7], [-0.2, 0.4]]
+    The given matrix follows the properties of an inverse matrix:
+        1. It is a square
+        2. It is non-singular
+        3. Let A be any matrices, in which AA^(-1) = I, where I is the identity matrix
+        4. A^(-1)A = I
+
+    To prove AA^(-1) = I:
+        [[4, 7], [2, 6]] * [[0.6, -0.7], [-0.2, 0.4]] = [[2.4 - 1.4, -2.8 + 2.8], [1.2 - 1.2, -1.4 + 2.4]]
+        = [[1, 0], [0, 1]]
+    
+    To prove that A^(-1)A = I
+        [[0.6, -0.7], [-0.2, 0.4]] * [[4, 7], [2, 6]]
+        = [[1, 0], [0, 1]]
+    
+        
+    Therefore, the inverse of C is [[0.6, -0.7], [-0.2, 0.4]], which is a valid inverse of C.
+    """
 
 
 # PART 2 (50 points), Q1: Normalize c*3**k/k!, derive expectation and variance.
