@@ -25,7 +25,7 @@ def generate_data(n_samples, seed, mean, covariance):
     plt.ylabel('Y')
     plt.title('Q2 2-Dimensional Dataset')
     # print(np.corrcoef(samples.T)[0, 1])
-    # plt.show()
+    plt.show()
     
     return samples
     
@@ -46,23 +46,25 @@ def pca(X):
     transposeData = X.T
     
     # Logic for calculating the mean of the generated data
-    xMean = np.mean(X, axis = 0)
+    mean = np.mean(X, axis = 0)
     # print(xMean)
-    retValue["Mean"] = xMean
+    retValue["Mean"] = mean
     
     # Logic for centering the dataset
-    centered = X - xMean
+    centered = X - mean
     retValue["Centered"] =  centered
     
     # Logic for computing the covariance matrix
     covMatrix = np.cov(transposeData)
     retValue["Covariance"] = covMatrix
     
+    
+    
     # Logic for computing the eigenvalues and eigenvectors, using the covariance matrix
     values, vectors = np.linalg.eigh(covMatrix)
     
     eigenDescending = np.argsort(values)[::-1]
-    retValue["Eigenvalues"] = eigenDescending
+    retValue["Eigenvalues"] = values[eigenDescending]
     
     # Logic for obtaining the components with eigenvectors
     components = vectors[:, eigenDescending]
@@ -71,6 +73,9 @@ def pca(X):
     # Logic for computing the score of the total rows
     scores = np.dot(centered, components)
     retValue["Scores"] = scores
+    # print(mean)
+    # print(covMatrix)
+    # print(components)
     
     return retValue
     
@@ -83,7 +88,36 @@ def main():
      to default arguments to avoid errors. """
     
     generated_sample = generate_data(500, 2, [2, -1], [[3, 1.2], [1.2, 1]])
-    pca(generated_sample)
+    result = pca(generated_sample)
+    
+    plt.scatter(generated_sample[:, 0], generated_sample[:, 1], alpha=0.5)
+
+    mean = result["Mean"]
+    components = result["Components"]
+    eigenvalues = result["Eigenvalues"]
+
+    for i, color in [(0, "red"), (1, "green")]:
+        direction = components[:, i] * np.sqrt(eigenvalues[i])
+
+        plt.quiver(
+            mean[0],
+            mean[1],
+            direction[0],
+            direction[1],
+            angles="xy",
+            scale_units="xy",
+            scale=0.5,
+            color=color,
+            label=f"PC{i + 1}"
+        )
+
+    plt.xlabel("Feature X")
+    plt.ylabel("Feature Y")
+    plt.title("Data with Principal Component Directions")
+    plt.axis("equal")
+    plt.legend()
+     # plt.show()
+    
     
     """
     From the generated dataset, we can see a positive correlationfrom both the X and Y coordinates. We can also
