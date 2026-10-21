@@ -135,7 +135,23 @@ def matrix_inverse(C=None):
 def distribution_moments(rate=3.):
     """Return (c, mean, variance) for P(X=k)=c*rate**k/k!, k>=0, rate>0."""
     # YOUR CODE HERE
-    raise NotImplementedError()
+    """
+    To find the normalization constant c, we will use the total probability rule, where:
+    Σ P(X = k) = 1
+
+    Thus, we can substitute P(X = k) from the original equation with Σ:
+    ∞
+    Σ c * (3^k) / k! = 1 
+    k = 0
+
+    We can factor out c since it does not depend on k:
+    ∞
+    c * Σ (3^k) / k! = 1 
+    k = 0
+
+    
+
+    """
 
 
 # P2 Q2: Show reasoning for intersection, conditional, and union probabilities.
