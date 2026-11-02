@@ -52,7 +52,12 @@ def identify_support_vectors():
     Return their 1-based point IDs and explain your choice in the report.
     """
     # TODO: Inspect the plot and identify all support vectors.
-    raise NotImplementedError("Identify and justify the support vectors.")
+    
+    """
+    Looking at the generated plot, we can see negative point 5 and 6 are the closest to positve point 1. 
+    From there, we can identify the support vector to be between negative point 5 and 6, as well as positve point 1.
+    """
+    return (1, 5, 6)
 
 
 def derive_svm_separator():
