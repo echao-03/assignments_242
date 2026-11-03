@@ -5,6 +5,7 @@ Implement the two update functions from scratch, then complete the experiment.
 
 import argparse
 from pathlib import Path
+import numpy as np
 
 K_VALUES = (2, 3, 4, 6, 10)
 
@@ -18,7 +19,25 @@ def update_assignments(data, centroids):
     Resolve equal-distance ties consistently and document your rule.
     """
     # TODO: Compute distances and assign each point to a centroid.
-    raise NotImplementedError("Implement the assignment step from scratch.")
+    retValue = []
+
+    for point in data:
+        curCentroid = float("inf")
+        centroidIndex = None
+        for i in range(len(centroids)):
+            print(point, centroids[i])
+            distance = np.linalg.norm(point - centroids[i])
+            if distance < curCentroid:
+                curCentroid = distance
+                centroidIndex = i
+            
+
+        retValue.append(centroidIndex)
+
+    return np.array(retValue, dtype = int)
+    
+
+
 
 
 def update_centroids(data, centroids, assignments):
@@ -28,8 +47,9 @@ def update_centroids(data, centroids, assignments):
     its previous centroid. Avoid modifying the input centroid array in place.
     """
     # TODO: Update the centroid of each nonempty cluster.
+
+
     # TODO: Handle empty clusters using your documented policy.
-    raise NotImplementedError("Implement the centroid step from scratch.")
 
 
 def kmeans(data, centroids, max_iterations=100):
