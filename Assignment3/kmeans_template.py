@@ -47,7 +47,24 @@ def update_centroids(data, centroids, assignments):
     its previous centroid. Avoid modifying the input centroid array in place.
     """
     # TODO: Update the centroid of each nonempty cluster.
+    retValue = []
 
+    for i in range(len(centroids)):
+        totalX = 0
+        totalY = 0
+        # IF cluster is empty
+        if assignments.count(i) == 0:
+
+        for j in range(len(data)):
+            if assignments[j] == i:
+                totalX += data[j][0]
+                totalY += data[j][1]
+
+        totalX = totalX / assignments.count(i)
+        totalY = totalY / assignments.count(i)
+        retValue.append([totalX, totalY])
+
+    return np.array(retValue, dtype = int)
 
     # TODO: Handle empty clusters using your documented policy.
 
@@ -83,6 +100,8 @@ def run_experiments(output_dir, seed=0, max_iterations=100):
     must cluster the features without access to those labels.
     """
     # TODO: Load toy data, create a seeded RNG, and initialize centroids.
+        # Call make_toy_data()
+        # Call get_inital_clusters(k, data, seed)
     # TODO: Run kmeans for every value in K_VALUES.
     # TODO: Plot each set of cluster assignments and its final centroids.
     # TODO: Save plots under output_dir and discuss the effect of k.
