@@ -47,24 +47,20 @@ def update_centroids(data, centroids, assignments):
     its previous centroid. Avoid modifying the input centroid array in place.
     """
     # TODO: Update the centroid of each nonempty cluster.
-    retValue = []
+    
+    # Created a new array with a copy of the current centroids array
+    # Since numpy array is fixed, we can create a copy to ensure that the returned array is the same size as previous centroids 
+    new_centroids = centroids.astype(float)
 
     for i in range(len(centroids)):
-        totalX = 0
-        totalY = 0
-        # IF cluster is empty
-        if assignments.count(i) == 0:
+        # Obtain the cluster point coordinates that are connected to the current centroid
+        cluster_points = data[assignments == i]
 
-        for j in range(len(data)):
-            if assignments[j] == i:
-                totalX += data[j][0]
-                totalY += data[j][1]
+        # If the cluster is not empty, obtain the mean of the XY coordinates that is associated with the centroid and apply it to the aray
+        if len(cluster_points) > 0:
+            new_centroids[i] = cluster_points.mean(axis=0)
 
-        totalX = totalX / assignments.count(i)
-        totalY = totalY / assignments.count(i)
-        retValue.append([totalX, totalY])
-
-    return np.array(retValue, dtype = int)
+    return new_centroids
 
     # TODO: Handle empty clusters using your documented policy.
 
