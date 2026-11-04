@@ -9,7 +9,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.markers import MarkerStyle
 
-
 K_VALUES = (2, 3, 4, 6, 10)
 
 
@@ -32,14 +31,10 @@ def update_assignments(data, centroids):
             if distance < curCentroid:
                 curCentroid = distance
                 centroidIndex = i
-            
 
         retValue.append(centroidIndex)
 
-    return np.array(retValue, dtype = int)
-    
-
-
+    return np.array(retValue, dtype=int)
 
 
 def update_centroids(data, centroids, assignments):
@@ -49,9 +44,9 @@ def update_centroids(data, centroids, assignments):
     its previous centroid. Avoid modifying the input centroid array in place.
     """
     # TODO: Update the centroid of each nonempty cluster.
-    
+
     # Created a new array with a copy of the current centroids array
-    # Since numpy array is fixed, we can create a copy to ensure that the returned array is the same size as previous centroids 
+    # Since numpy array is fixed, we can create a copy to ensure that the returned array is the same size as previous centroids
     new_centroids = centroids.astype(float)
 
     for i in range(len(centroids)):
@@ -79,6 +74,7 @@ def kmeans(data, centroids, max_iterations=100):
 def make_toy_data():
     """Generate the exact make_blobs configuration from Assignment 4."""
     from sklearn.datasets import make_blobs
+
     return make_blobs(n_samples=4000, centers=4, cluster_std=0.60, random_state=0)
 
 
@@ -100,22 +96,22 @@ def run_experiments(output_dir, seed=0, max_iterations=100):
     # TODO: Load toy data, create a seeded RNG, and initialize centroids.
     # Call make_toy_data()
     # Call get_inital_clusters(k, data, seed)
-    
+
     # Create directory within current file location
-    output_dir.mkdir(parents = True, exist_ok = True)
-    
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     # Initialize data, and obtaining the coordinates from toy_data tuple
     toy_data = make_toy_data()
     data = toy_data[0]
-    
+
     # Need np rng data type for get_initial_clusters
     rng = np.random.default_rng(seed)
-    
+
     for current_k in K_VALUES:
         # Each current k value is used for clustering and kmeans
         initial_centroids = get_initial_clusters(current_k, data, rng)
         current_centroids, current_assignments = kmeans(data, initial_centroids, 100)
-        
+
         plt.figure(figsize=(8, 6))
         plt.scatter(
             data[:, 0],
@@ -125,7 +121,7 @@ def run_experiments(output_dir, seed=0, max_iterations=100):
             s=10,
             alpha=0.6,
         )
-        
+
         plt.scatter(
             current_centroids[:, 0],
             current_centroids[:, 1],
@@ -135,7 +131,7 @@ def run_experiments(output_dir, seed=0, max_iterations=100):
             edgecolors="black",
             label="Centroids",
         )
-        
+
         plt.title(f"K-means clustering with k={current_k}")
         plt.xlabel("Feature 1")
         plt.ylabel("Feature 2")
@@ -143,18 +139,27 @@ def run_experiments(output_dir, seed=0, max_iterations=100):
         plt.tight_layout()
         plt.savefig(output_dir / f"kmeans_k{current_k}.png")
         plt.close()
-            
+
     # TODO: Run kmeans for every value in K_VALUES.
     # TODO: Plot each set of cluster assignments and its final centroids.
     # TODO: Save plots under output_dir and discuss the effect of k.
+
+    """
+    From obtaining the different results based on $k$, we can see that the more centroids were created, the more diverse the data was. 
+    $k_4$ was able to split the data equally into its respective sections. However, when $k > 4$, it begins to over-cluster the data, causing splits between already classified clusters. 
+    Depending on whether we need to identify a subgroup within the clusters, the over-clustering could lead to misinformation.
+    """
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--max-iterations", type=int, default=100)
-    parser.add_argument("--output-dir", type=Path,
-                        default=Path(__file__).resolve().parent / "results" / "kmeans")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=Path(__file__).resolve().parent / "results" / "kmeans",
+    )
     args = parser.parse_args()
     run_experiments(args.output_dir, args.seed, args.max_iterations)
 
