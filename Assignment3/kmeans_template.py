@@ -6,6 +6,9 @@ Implement the two update functions from scratch, then complete the experiment.
 import argparse
 from pathlib import Path
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.markers import MarkerStyle
+
 
 K_VALUES = (2, 3, 4, 6, 10)
 
@@ -25,7 +28,6 @@ def update_assignments(data, centroids):
         curCentroid = float("inf")
         centroidIndex = None
         for i in range(len(centroids)):
-            print(point, centroids[i])
             distance = np.linalg.norm(point - centroids[i])
             if distance < curCentroid:
                 curCentroid = distance
@@ -96,12 +98,55 @@ def run_experiments(output_dir, seed=0, max_iterations=100):
     must cluster the features without access to those labels.
     """
     # TODO: Load toy data, create a seeded RNG, and initialize centroids.
-        # Call make_toy_data()
-        # Call get_inital_clusters(k, data, seed)
+    # Call make_toy_data()
+    # Call get_inital_clusters(k, data, seed)
+    
+    # Create directory within current file location
+    output_dir.mkdir(parents = True, exist_ok = True)
+    
+    # Initialize data, and obtaining the coordinates from toy_data tuple
+    toy_data = make_toy_data()
+    data = toy_data[0]
+    
+    # Need np rng data type for get_initial_clusters
+    rng = np.random.default_rng(seed)
+    
+    for current_k in K_VALUES:
+        # Each current k value is used for clustering and kmeans
+        initial_centroids = get_initial_clusters(current_k, data, rng)
+        current_centroids, current_assignments = kmeans(data, initial_centroids, 100)
+        
+        plt.figure(figsize=(8, 6))
+        plt.scatter(
+            data[:, 0],
+            data[:, 1],
+            c=current_assignments,
+            cmap="viridis",
+            s=10,
+            alpha=0.6,
+        )
+        
+        plt.scatter(
+            current_centroids[:, 0],
+            current_centroids[:, 1],
+            c="red",
+            marker=MarkerStyle("X"),
+            s=150,
+            edgecolors="black",
+            label="Centroids",
+        )
+        
+        plt.title(f"K-means clustering with k={current_k}")
+        plt.xlabel("Feature 1")
+        plt.ylabel("Feature 2")
+        plt.legend()
+        plt.tight_layout()
+        plt.savefig(output_dir / f"kmeans_k{current_k}.png")
+        plt.close()
+            
     # TODO: Run kmeans for every value in K_VALUES.
     # TODO: Plot each set of cluster assignments and its final centroids.
     # TODO: Save plots under output_dir and discuss the effect of k.
-    raise NotImplementedError("Complete the K-means experiment and plots.")
 
 
 def main():
