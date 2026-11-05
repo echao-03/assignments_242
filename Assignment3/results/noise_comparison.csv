@@ -1,4 +1,4 @@
-Number,Baseline Accuracy,KNN Accuracy
+trial,baseline_accuracy,knn_accuracy
 1,0.8345,0.8615
 2,0.833,0.872
 3,0.844,0.8675

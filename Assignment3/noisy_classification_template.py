@@ -155,9 +155,9 @@ def run_comparison(repeats, seed, neighbors, output_path):
 
         results.append(
             {
-                "Number": idx + 1,
-                "Baseline Accuracy": baseline,
-                "KNN Accuracy": knn_accuracy,
+                "trial": idx + 1,
+                "baseline_accuracy": baseline,
+                "knn_accuracy": knn_accuracy,
             }
         )
 
@@ -166,17 +166,17 @@ def run_comparison(repeats, seed, neighbors, output_path):
         writer = csv.DictWriter(
             csv_file,
             fieldnames=[
-                "Number",
-                "Baseline Accuracy",
-                "KNN Accuracy",
+                "trial",
+                "baseline_accuracy",
+                "knn_accuracy",
             ],
         )
         writer.writeheader()
         writer.writerows(results)
 
     # Obtained both baseline and new mean for comparison
-    baseline_mean = np.mean([result["Baseline Accuracy"] for result in results])
-    knn_mean = np.mean([result["KNN Accuracy"] for result in results])
+    baseline_mean = np.mean([result["baseline_accuracy"] for result in results])
+    knn_mean = np.mean([result["knn_accuracy"] for result in results])
 
     print("Baseline Mean: ", baseline_mean)
     print("KNN Mean: ", knn_mean)
