@@ -110,8 +110,12 @@ def main(seed = 0, max_iterations = 100):
         current_centroids, current_assignments = kmeans(X_scaled, initial_centroids, max_iterations)
         print("centroids:", current_centroids, "assignments:", current_assignments)
     
-    # Use PDA to reduce dimentionality
-    # Determine which k value is needed for clustering
+    # 1. Use PDA to reduce dimentionality
+    # 2. Use the newly modified data from PDA to make graph
+    # 3. Use Silhouette Score to find best K value (use the history output from kmeans to obtain past data)
+    
+    
+    
     
 
 
