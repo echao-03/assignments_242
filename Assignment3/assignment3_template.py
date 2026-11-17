@@ -1,10 +1,8 @@
-"""CSE 242 Assignment 3, Question 1: hard-margin linear SVM (30 points).
-"""
+"""CSE 242 Assignment 3, Question 1: hard-margin linear SVM (30 points)."""
 
 import argparse
 from pathlib import Path
 import math
-
 
 SVM_X = ((1, 1), (1, 2), (2, 1), (0, 0), (1, 0), (0, 1))
 SVM_Y = (1, 1, 1, -1, -1, -1)
@@ -28,14 +26,22 @@ def plot_svm_data(output_path):
     for label, color, marker in ((1, "tab:blue", "o"), (-1, "tab:orange", "s")):
         points = [x for x, y in zip(SVM_X, SVM_Y) if y == label]
         ax.scatter(
-            [x[0] for x in points], [x[1] for x in points],
-            color=color, marker=marker, s=90, label=f"y = {label:+d}",
+            [x[0] for x in points],
+            [x[1] for x in points],
+            color=color,
+            marker=marker,
+            s=90,
+            label=f"y = {label:+d}",
         )
     for point_id, (x1, x2) in enumerate(SVM_X, start=1):
-        ax.annotate(str(point_id), (x1, x2), xytext=(7, 7),
-                    textcoords="offset points")
-    ax.set(xlabel="x1", ylabel="x2", title="Assignment 3: SVM training data",
-           xlim=(-0.5, 2.5), ylim=(-0.5, 2.5))
+        ax.annotate(str(point_id), (x1, x2), xytext=(7, 7), textcoords="offset points")
+    ax.set(
+        xlabel="x1",
+        ylabel="x2",
+        title="Assignment 3: SVM training data",
+        xlim=(-0.5, 2.5),
+        ylim=(-0.5, 2.5),
+    )
     ax.set_aspect("equal", adjustable="box")
     ax.grid(alpha=0.3)
     ax.legend()
@@ -53,7 +59,7 @@ def identify_support_vectors():
     Return their 1-based point IDs and explain your choice in the report.
     """
     # TODO: Inspect the plot and identify all support vectors.
-    
+
     """
     Looking at the generated plot, we can see negative point 5 and 6 would be the negative boundaries, while the postive boundary would be on point 1. 
     From there, we can identify the support vector to be between negative point 5 and 6, as well as positve point 1.
@@ -71,30 +77,33 @@ def derive_svm_separator():
     Explain the derivation and your margin convention in the written report.
     """
     # TODO: Derive the maximum-margin separating line from the support vectors.
-    
 
     # Obtained both weights using the coordinates of the support vectors.
     weights = (2, 2)
-    
+
     # Substituted weights into equation to obtain the bias.
     bias = -3
-    
+
     # Used euclidean norm of the weight vector w.
     geometric_margin = 1 / math.sqrt(2**2 + 2**2)
-    
+
     return weights, bias, geometric_margin
-        
-    # TODO: Determine the geometric margin and state its meaning.
-    raise NotImplementedError("Derive the SVM boundary and geometric margin.")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--task", choices=("plot", "svm"),
-                        default="plot", help="Default: generate the SVM data plot.")
-    parser.add_argument("--output", type=Path,
-                        default=Path(__file__).resolve().parent / "svm_data.png",
-                        help="Output image path for --task plot.")
+    parser.add_argument(
+        "--task",
+        choices=("plot", "svm"),
+        default="plot",
+        help="Default: generate the SVM data plot.",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=Path(__file__).resolve().parent / "svm_data.png",
+        help="Output image path for --task plot.",
+    )
     args = parser.parse_args()
     if args.task == "plot":
         print(f"Saved plot to {plot_svm_data(args.output)}")
