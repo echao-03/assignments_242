@@ -2,6 +2,8 @@
 
 You do not need to use this file. Add, remove, or reorganize functions as useful.
 """
+import argparse
+from pathlib import Path
 
 import numpy as np
 import csv
@@ -70,8 +72,9 @@ def repair_labels(X, y_noisy, **kwargs):
     raise NotImplementedError
 
 K_VALUES = [4, 6, 8, 10]
-def main(seed = 0, max_iterations = 100):
-    # Iterate through .csv data, grabbing only countries with 2014 data
+
+def run_experiments(seed = 0, max_iterations = 100):
+        # Iterate through .csv data, grabbing only countries with 2014 data
         # Life expectancy, Adult mortality, Alcohol, and GDP
     newData = {}
         
@@ -113,6 +116,20 @@ def main(seed = 0, max_iterations = 100):
     # 1. Use PDA to reduce dimentionality
     # 2. Use the newly modified data from PDA to make graph
     # 3. Use Silhouette Score to find best K value (use the history output from kmeans to obtain past data)
+    
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repeats", type=int, default=100)
+    parser.add_argument("--seed", type = int, default = 0)
+    
+    parser.add_argument("--output", type = Path, default = Path(__file__).resolve().parent / "results" ,)
+    
+    args = parser.parse_args()
+    run_experiments(args.seed, args.repeats)
+    
+    
+    
+    
     
     
     
