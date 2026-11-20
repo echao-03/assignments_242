@@ -12,6 +12,17 @@ from matplotlib.markers import MarkerStyle
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
 from matplotlib import colormaps
+import pandas as pd
+
+import pandas as pd
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.metrics import (
+    accuracy_score,
+    balanced_accuracy_score,
+)
 
 
 
@@ -91,7 +102,7 @@ def within_cluster_wcss(X, centroids, assignments):
 
 K_VALUES = [4, 6, 8, 10, 12, 14, 16,  18, 20, 22, 24, 26, 28, 30]
 
-def run_experiments(output, output_csv, seed = 0, max_iterations = 100):
+def kmeans_experiments(output, seed = 0, max_iterations = 100):
         # Iterate through .csv data, grabbing only countries with 2014 data
         # Life expectancy, Adult mortality, Alcohol, and GDP
         
@@ -136,13 +147,10 @@ def run_experiments(output, output_csv, seed = 0, max_iterations = 100):
         current_centroids, current_assignments = kmeans(X_scaled, initial_centroids, max_iterations)
         
         
-        
         pca = PCA(n_components = 2)
         reduced_PCA = pca.fit_transform(X_scaled)
         reduced_centroids = pca.transform(current_centroids)
         
-        
-       
         score = silhouette_score(X_scaled, current_assignments)
         
         # wcss = within_cluster_wcss(
@@ -191,9 +199,55 @@ def run_experiments(output, output_csv, seed = 0, max_iterations = 100):
         plt.tight_layout()
         plt.savefig(output / f"kmeans_k_g{current_k}.png")
         plt.close()
-        
-
     
+
+def noisy_experiments(output, seed = 0, max_iteration = 100):
+    # Obtain data from csv file
+    data = pd.read_csv('Life_Expectancy_Data.csv')
+
+    # Filtering data to only include each countries' data from 2014
+    data = data.loc[data["Year"] == 2014].copy()    
+
+    features = ["Life expectancy", "Adult Mortality", "Schooling", "GDP"]
+
+    label = "Status"
+
+    model_data = data.dropna(subset = features + [label]).copy()
+
+    X = model_data[features]
+    y = model_data[label]
+
+    print("Rows used:", len(model_data))
+    print("Classes:", y.value_counts().to_dict())
+
+    X_train_validation, X_test, y_train_validation, y_test = train_test_split(X, y, test_size = 0.20, stratify = y, random_state = seed)
+
+    X_train, X_val, y_train, y_val = train_test_split(X_train_validation, y_train_validation, test_size = 0.25, stratify = y_train_validation, random_state = seed)
+
+    pipeline = Pipeline([
+    ("scale", StandardScaler()),
+    ("svc", SVC(kernel="rbf")),
+    ])
+
+    parameter_grid = {
+    "svc__C": [0.1, 1, 10, 100],
+    "svc__gamma": ["scale", 0.01, 0.1, 1],
+    }
+
+    search = GridSearchCV(
+    pipeline,
+    parameter_grid,
+    cv=5,
+    scoring="balanced_accuracy",
+    )
+
+    search.fit(X_train_validation, y_train_validation)
+
+    print("Best parameters:", search.best_params_)
+    predictions = search.predict(X_test)
+
+    print("Accuracy:", accuracy_score(y_test, predictions))
+
 
                 
        
@@ -209,15 +263,17 @@ def main():
     
     parser.add_argument("--output", type = Path, default = Path(__file__).resolve().parent / "results" / "kmeans",)
     
-    parser.add_argument("--output_csv", type = bool, default = False)
+    parser.add_argument("--kmeans", type = bool, default = False)
+
+    parser.add_argument("--noisy", type = bool, default = False)
     
     args = parser.parse_args()
-    run_experiments(args.output, args.seed, args.repeats)
     
+    if args.noisy == True:
+        noisy_experiments(args.output, args.seed, args.repeats)
     
-    
-    
-    
+    if args.kmeans == True:
+        kmeans_experiments(args.output, args.seed, args.repeats)
     
     
     
