@@ -23,6 +23,10 @@ from sklearn.metrics import (
     accuracy_score,
     balanced_accuracy_score,
 )
+from sklearn.base import clone
+from sklearn.neighbors import NearestNeighbors
+
+
 
 
 
@@ -77,16 +81,50 @@ def get_initial_clusters(k, data, rng):
     Repeated initial rows are possible; your empty-cluster policy must cope.
     """
     return data[rng.integers(0, data.shape[0], size=k)].copy()
+        
 
 
-def corrupt_labels(y, noise_config, random_state=None):
+
+
+def corrupt_labels(y, noise_config, seed = 0):
     """Create a reproducible noisy version of y according to your design."""
-    raise NotImplementedError
+    corrupt_label = np.asarray(y, dtype = object).copy()
+    
+    rng = np.random.default_rng(seed)
+    if noise_config == "Asymmetric":
+        for idx, label in enumerate(corrupt_label):
+            if label == "Developing":
+                if rng.random() < 0.30:
+                    corrupt_label[idx] = "Developed"
+            
+            elif label == "Developed":
+                if rng.random() < 0.10:
+                    corrupt_label[idx] = "Developing"
+                    
+            else:
+                # Edge case to check if label is not expected
+                return ValueError(f"Unexpected label: {label}")
+         
+    # If noise_config is "symmetric"        
+    else:
+        for idx, label in enumerate(corrupt_label):
+            if rng.random() > 0.30:
+                if label == "Developing":
+                    corrupt_label[idx] = "Developed"
+                else:
+                    corrupt_label[idx] = "Developing"
+                    
+    return corrupt_label
+    
+    
 
 
-def repair_labels(X, y_noisy, **kwargs):
+def repair_labels(X, y_noisy, neighbors):
     """Optional structure for your nearest-neighbor or clustering repair method."""
-    raise NotImplementedError
+    
+    near_neighbors = NearestNeighbors(n_neighbors = neighbors + 1, algorithm = "auto").fit(X)
+    
+    
 
 def within_cluster_wcss(X, centroids, assignments):
     wcss = 0.0
@@ -220,9 +258,9 @@ def noisy_experiments(output, seed = 0, max_iteration = 100):
     print("Rows used:", len(model_data))
     print("Classes:", y.value_counts().to_dict())
 
-    X_train_validation, X_test, y_train_validation, y_test = train_test_split(X, y, test_size = 0.20, stratify = y, random_state = seed)
+    X_train_validation, X_test, y_train_validation, y_test = train_test_split(X, y, test_size = 0.40, stratify = y, random_state = seed)
 
-    X_train, X_val, y_train, y_val = train_test_split(X_train_validation, y_train_validation, test_size = 0.25, stratify = y_train_validation, random_state = seed)
+    X_train, X_val, y_train, y_val = train_test_split(X_train_validation, y_train_validation, test_size = 0.50, stratify = y_train_validation, random_state = seed)
 
     pipeline = Pipeline([
     ("scale", StandardScaler()),
@@ -241,14 +279,74 @@ def noisy_experiments(output, seed = 0, max_iteration = 100):
     scoring="balanced_accuracy",
     )
 
-    search.fit(X_train_validation, y_train_validation)
+    search.fit(X_train, y_train)
+    val_predictions = search.predict(X_val)
 
     print("Best parameters:", search.best_params_)
     predictions = search.predict(X_test)
 
-    print("Accuracy:", accuracy_score(y_test, predictions))
+    print("Accuracy:", accuracy_score(y_val, val_predictions))
+    
+    X_train_final = pd.concat([X_train, X_val])
+    y_train_final = pd.concat([y_train, y_val])
 
+    final_model = Pipeline([
+        ("scale", StandardScaler()),
+        ("svc", SVC(
+            kernel="rbf",
+            C=search.best_params_["svc__C"],
+            gamma=search.best_params_["svc__gamma"],
+        )),
+    ])
 
+    final_model.fit(X_train_final, y_train_final)
+
+    # Baseline has been established
+    test_predictions = final_model.predict(X_test)
+    print("Test accuracy:", accuracy_score(y_test, test_predictions))
+    
+    noisy_labels = ["Asymmetric", "Symmetric"]
+    
+    results = {}
+    
+    rng = np.random.default_rng(seed)
+
+    for noisy_setting in noisy_labels:
+        accuracies = []
+        
+        
+        for _ in range(max_iteration):
+            repeat_seed = rng.integers(0, 1_000_000_000)
+            
+            noisy_model = clone(final_model)
+            
+            y_train_noisy = corrupt_labels(y_train, noisy_setting, int(repeat_seed))
+            noisy_model.fit(X_train, y_train_noisy)
+            
+            noisy_predictions = noisy_model.predict(X_test)
+            
+            current_accuracy = accuracy_score(y_test, noisy_predictions)
+            
+            accuracies.append(current_accuracy)
+        
+        mean_accuracy = np.mean(accuracies)
+        
+        std_accuracy = np.std(accuracies, ddof=1)
+
+        results[noisy_setting] = {
+            "accuracies": accuracies,
+            "mean": mean_accuracy,
+            "std": std_accuracy,
+        }
+        print(
+            f"{noisy_setting}: "
+            f"mean accuracy = {mean_accuracy:.3f}, "
+            f"standard deviation = {std_accuracy:.3f}"
+        )
+        
+    
+            
+            
                 
        
     # 1. Use PDA to reduce dimentionality
